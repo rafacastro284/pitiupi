@@ -1,0 +1,10 @@
+{
+  "java.project.sourcePaths": [
+    "pitiupi/src",
+    "plugins/chat/src",
+    "plugins/screencast/src",
+    "plugins/adedanha/src"
+  ],
+  "java.project.outputPath": ".vscode/java-bin",
+  "java.project.referencedLibraries": []
+}
