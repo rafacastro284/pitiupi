@@ -10,3 +10,6 @@
 /plugins/mpchat/out/
 /plugins/mpchat/dist/
 /.pitiupi/
+/plugins/adedanha/build/
+/plugins/adedanha/dist/
+/plugins/adedanha/nbproject/private/
