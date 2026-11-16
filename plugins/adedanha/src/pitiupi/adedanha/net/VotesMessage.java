@@ -1,9 +1,7 @@
 package pitiupi.adedanha.net;
 
-import pitiupi.models.Messages.Message;
-
 /** Votos de anulação de um jogador. Cada item é "playerId#indiceCategoria". Vai por TCP. */
-public class VotesMessage extends Message {
+public class VotesMessage extends AdedanhaMessage {
 
     private static final long serialVersionUID = 1L;
 

@@ -8,10 +8,12 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -46,6 +48,10 @@ public class AdedanhaPanel extends JPanel implements GameListener {
     private static final String CARD_RESULT = "result";
 
     private AdedanhaController controller;
+    private Function<String, String> onAddPlayerIp;
+
+    private final JTextField ipField = new JTextField(14);
+    private final JLabel knownPlayersLabel = new JLabel("Por IP: ninguém ainda");
 
     private final CardLayout cards = new CardLayout();
     private final JPanel cardHost = new JPanel(cards);
@@ -77,7 +83,10 @@ public class AdedanhaPanel extends JPanel implements GameListener {
         setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
         status.setFont(status.getFont().deriveFont(Font.BOLD));
-        add(status, BorderLayout.NORTH);
+        JPanel top = new JPanel(new BorderLayout(4, 4));
+        top.add(buildPlayersBar(), BorderLayout.NORTH);
+        top.add(status, BorderLayout.SOUTH);
+        add(top, BorderLayout.NORTH);
 
         cardHost.add(buildPlayCard(), CARD_PLAY);
         cardHost.add(buildVoteCard(), CARD_VOTE);
@@ -99,7 +108,47 @@ public class AdedanhaPanel extends JPanel implements GameListener {
         this.controller = controller;
     }
 
+    /** O plugin diz o que fazer com um IP digitado (devolve uma mensagem de erro, ou null se deu certo). */
+    public void setOnAddPlayerIp(Function<String, String> onAddPlayerIp) {
+        this.onAddPlayerIp = onAddPlayerIp;
+    }
+
+    /** Atualiza a linha "Por IP: ..." com os jogadores que o plugin conhece. */
+    public void showKnownPlayers(Collection<String> ips) {
+        SwingUtilities.invokeLater(() -> knownPlayersLabel.setText(ips.isEmpty()
+                ? "Por IP: ninguém ainda"
+                : "Por IP: " + String.join(", ", ips)));
+    }
+
     // ------------------------------------------------------------------ montagem
+
+    /**
+     * Barra para quando o multicast não chega (lista de usuários vazia): digitar o IP de
+     * um jogador. Basta um dos dois digitar; o outro aprende o IP pela primeira mensagem.
+     */
+    private JPanel buildPlayersBar() {
+        JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
+        bar.add(new JLabel("IP do jogador:"));
+        bar.add(ipField);
+        JButton add = new JButton("Adicionar");
+        Runnable addAction = () -> {
+            if (onAddPlayerIp == null) {
+                return;
+            }
+            String error = onAddPlayerIp.apply(ipField.getText().trim());
+            if (error == null) {
+                appendLog("Jogador adicionado por IP: " + ipField.getText().trim() + ".");
+                ipField.setText("");
+            } else {
+                appendLog(error);
+            }
+        };
+        add.addActionListener(e -> addAction.run());
+        ipField.addActionListener(e -> addAction.run());
+        bar.add(add);
+        bar.add(knownPlayersLabel);
+        return bar;
+    }
 
     private JPanel buildPlayCard() {
         JPanel card = new JPanel(new BorderLayout(8, 8));

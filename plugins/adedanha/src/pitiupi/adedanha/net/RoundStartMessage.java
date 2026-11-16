@@ -1,9 +1,7 @@
 package pitiupi.adedanha.net;
 
-import pitiupi.models.Messages.Message;
-
-/** Anuncia uma rodada nova: letra sorteada e categorias. Vai por UDP multicast. */
-public class RoundStartMessage extends Message {
+/** Anuncia uma rodada nova: letra sorteada e categorias. Vai por UDP multicast e, para os IPs conhecidos, UDP unicast. */
+public class RoundStartMessage extends AdedanhaMessage {
 
     private static final long serialVersionUID = 1L;
 

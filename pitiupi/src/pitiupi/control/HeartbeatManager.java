@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import pitiupi.models.User;
 import pitiupi.models.Messages.GoodbyeMessage;
+import pitiupi.models.Messages.Message;
 import pitiupi.models.Messages.HeartbeatMessage;
 import java.util.UUID;
 /**
@@ -76,6 +77,22 @@ public class HeartbeatManager {
         }
         HeartbeatMessage msg = new HeartbeatMessage(connectionManager.getUserName(), instanceId);
         connectionManager.sendUdpMulticast(msg);
+        sendUnicastCopies(msg);
+    }
+
+    /**
+     * Eco unicast: além do multicast, manda uma cópia direta para cada peer que já está
+     * na lista. Em Wi-Fi que não entrega multicast a algum PC (o ponto de acesso filtra),
+     * esse PC ainda é visto pelos outros, porque o multicast dele sai; com a cópia
+     * unicast de volta, ele também passa a ver os outros.
+     */
+    private void sendUnicastCopies(Message msg) {
+        for (User peer : peers.values()) {
+            InetAddress address = peer.getAddress();
+            if (address != null) {
+                connectionManager.sendUdpUnicast(msg, address);
+            }
+        }
     }
 
     public void announceNow() {
@@ -88,6 +105,7 @@ public class HeartbeatManager {
         }
         GoodbyeMessage msg = new GoodbyeMessage(connectionManager.getUserName(), instanceId);
         connectionManager.sendUdpMulticast(msg);
+        sendUnicastCopies(msg);
     }
 
     public void sendGoodbyeAndStop() {

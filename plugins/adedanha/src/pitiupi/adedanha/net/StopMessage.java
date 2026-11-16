@@ -1,9 +1,7 @@
 package pitiupi.adedanha.net;
 
-import pitiupi.models.Messages.Message;
-
-/** Alguém gritou STOP. Vai por UDP multicast; repetidos são ignorados. */
-public class StopMessage extends Message {
+/** Alguém gritou STOP. Vai por UDP multicast e unicast; repetidos são ignorados. */
+public class StopMessage extends AdedanhaMessage {
 
     private static final long serialVersionUID = 1L;
 

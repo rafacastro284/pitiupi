@@ -1,9 +1,7 @@
 package pitiupi.adedanha.net;
 
-import pitiupi.models.Messages.Message;
-
 /** Respostas de um jogador; answers[i] responde a categoria i. Vai por TCP. */
-public class AnswersMessage extends Message {
+public class AnswersMessage extends AdedanhaMessage {
 
     private static final long serialVersionUID = 1L;
 
