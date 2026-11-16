@@ -1,0 +1,9 @@
+#Pitiupi plugin metadata
+#Mon Nov 16 16:24:35 BRT 2026
+arquivoId=chat
+author=Fl\u00E1vio Schiavoni
+description=
+displayName=Conversa na rede
+identifier=Pitiupi.Chat.Example
+name=Chat
+version=1
