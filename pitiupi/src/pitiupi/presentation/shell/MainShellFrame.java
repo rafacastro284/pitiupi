@@ -25,6 +25,8 @@ public final class MainShellFrame extends JFrame implements ShellHost {
     private final PluginGalleryPanel galleryPanel;
     private final SettingsPanel settingsPanel;
     private final JLabel statusLabel = new JLabel(" ");
+    private final pitiupi.plugins.remote.PluginServer pluginServer =
+            new pitiupi.plugins.remote.PluginServer(pitiupi.platform.PitiupiHome.get().pluginsDirectory());
 
     public MainShellFrame(String userName, int port) {
         setTitle("Pitiupi");
@@ -45,7 +47,7 @@ public final class MainShellFrame extends JFrame implements ShellHost {
         galleryPanel.setOpenHandler(this::openPluginTabFromGallery);
 
         networkUsersPanel = new NetworkUsersPanel(connectionManager);
-        ShellMenuBar menuBar = new ShellMenuBar();
+        ShellMenuBar menuBar = new ShellMenuBar(this, pluginServer);
         setJMenuBar(menuBar);
 
         JPanel center = new JPanel(new BorderLayout());
@@ -126,6 +128,7 @@ public final class MainShellFrame extends JFrame implements ShellHost {
 
     @Override
     public void exit() {
+        pluginServer.stop();
         connectionManager.shutdownGracefully();
         setVisible(false);
         dispose();

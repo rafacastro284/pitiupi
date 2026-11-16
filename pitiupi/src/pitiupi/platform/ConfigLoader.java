@@ -50,6 +50,15 @@ public final class ConfigLoader {
         store();
     }
 
+    public String getString(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
+    }
+
+    public void setString(String key, String value) throws IOException {
+        properties.setProperty(key, value);
+        store();
+    }
+
     public boolean isMigrationCwdPluginsDone() {
         return getBoolean("migration.cwdPluginsDone", false);
     }

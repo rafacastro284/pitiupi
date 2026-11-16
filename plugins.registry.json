@@ -20,13 +20,6 @@
       "build": "ant",
       "jar": "dist/pitiupi.ping.jar",
       "menuCategory": "Social"
-    },
-    {
-      "id": "adedanha",
-      "dir": "plugins/adedanha",
-      "build": "ant",
-      "jar": "dist/pitiupi.adedanha.jar",
-      "menuCategory": "Jogos"
     }
   ]
 }

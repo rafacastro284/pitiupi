@@ -37,6 +37,13 @@ public abstract class Plugin {
 
     public abstract String getAuthor();
     public abstract String getVersion();
+
+    /**
+     * Descrição curta exibida na lista de plugins online. Padrão: vazia.
+     */
+    public String getDescription() {
+        return "";
+    }
     public abstract String getIdentifier();
 
     /**

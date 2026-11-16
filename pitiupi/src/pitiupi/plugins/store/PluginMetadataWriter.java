@@ -21,6 +21,7 @@ public final class PluginMetadataWriter {
         props.setProperty("displayName", plugin.getDisplayName());
         props.setProperty("author", plugin.getAuthor());
         props.setProperty("version", plugin.getVersion());
+        props.setProperty("description", java.util.Objects.requireNonNullElse(plugin.getDescription(), ""));
         String arquivoId = deriveArquivoId(jarPath, plugin);
         props.setProperty("arquivoId", arquivoId);
 
@@ -29,7 +30,7 @@ public final class PluginMetadataWriter {
         }
     }
 
-    static Path metaPathFor(Path jarPath) {
+    public static Path metaPathFor(Path jarPath) {
         return Path.of(jarPath.toString() + ".plugin.meta");
     }
 
