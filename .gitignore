@@ -1,0 +1,16 @@
+/pitiupi/build/
+/pitiupi/dist/
+/pitiupi/nbproject/private/
+/plugins/chat/build/
+/plugins/chat/dist/
+/plugins/chat/nbproject/private/
+/plugins/screencast/build/
+/plugins/screencast/dist/
+/plugins/screencast/nbproject/private/
+/plugins/mpchat/out/
+/plugins/mpchat/dist/
+/.pitiupi/
+/plugins/adedanha/build/
+/plugins/adedanha/dist/
+/plugins/adedanha/nbproject/private/
+/.vscode/java-bin/

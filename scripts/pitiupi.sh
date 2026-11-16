@@ -407,6 +407,18 @@ case "${CMD}" in
       printf 'Plugins em %s\n' "${PLUGINS_DIR}"
     else
       link_plugins_from_selection link
+      # Terminal do VS Code em snap: GTK_PATH e afins apontam para libs do snap
+      # (core20) e o Java morre com "symbol lookup error" ao carregar o GTK.
+      for var in GTK_PATH GTK_EXE_PREFIX GTK_IM_MODULE_FILE GIO_MODULE_DIR \
+          GDK_PIXBUF_MODULE_FILE GDK_PIXBUF_MODULEDIR GSETTINGS_SCHEMA_DIR LOCPATH LD_LIBRARY_PATH; do
+        if [[ "${!var:-}" == */snap/* ]]; then unset "${var}"; fi
+      done
+      for var in XDG_DATA_DIRS XDG_CONFIG_DIRS GDK_BACKEND; do
+        orig="${var}_VSCODE_SNAP_ORIG"
+        if [[ -n "${!orig+x}" ]]; then
+          if [[ -n "${!orig}" ]]; then export "${var}=${!orig}"; else unset "${var}"; fi
+        fi
+      done
       exec java -jar "${CORE}/dist/pitiupi.jar"
     fi
     ;;
