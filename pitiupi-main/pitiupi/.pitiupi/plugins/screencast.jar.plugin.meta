@@ -1,9 +1,0 @@
-#Pitiupi plugin metadata
-#Mon Nov 16 16:24:35 BRT 2026
-arquivoId=screencast
-author=Fl\u00E1vio Schiavoni
-description=
-displayName=Compartilhar tela
-identifier=Pitiupi.ScreenCast.Example
-name=ScreenCast
-version=0.1

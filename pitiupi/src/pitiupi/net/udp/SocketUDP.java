@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.net.*;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -163,35 +164,73 @@ public class SocketUDP extends Thread {
      * @throws ClassNotFoundException caso ocorra um erro ao verificar uma
      *         mensagem de heartbeat.
      */
-    public void receive() throws UnknownHostException, IOException, ClassNotFoundException {
-        byte[] buf = new byte[256000];
+    public void receive() throws IOException {
+        byte[] buffer = new byte[256000];
+
         while (running) {
-            DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);
+            DatagramPacket packet = new DatagramPacket(
+                    buffer,
+                    buffer.length
+            );
+
             try {
-                multicastSocket.receive(msgPacket);
+                multicastSocket.receive(packet);
+                handlePacket(packet);
+
+            } catch (SocketException ex) {
+                if (!running) {
+                    break;
+                }
+
+                Logger.getLogger(SocketUDP.class.getName())
+                        .log(Level.SEVERE, "Erro no socket UDP", ex);
+
+                break;
+
             } catch (IOException ex) {
                 if (!running) {
                     break;
                 }
-                throw ex;
-            }
 
-            Object coreMessage = tryParseCoreUdpMessage(msgPacket.getData());
-            if (coreMessage instanceof HeartbeatMessage heartbeat) {
-                connectionManager.receiveHeartbeat(heartbeat, msgPacket.getAddress());
-                continue;
-            }
-            if (coreMessage instanceof GoodbyeMessage goodbye) {
-                connectionManager.receiveGoodbye(goodbye);
-                continue;
-            }
-            if (coreMessage instanceof SessionInviteMessage invite) {
-                connectionManager.receiveSessionInvite(invite);
-                continue;
-            }
+                Logger.getLogger(SocketUDP.class.getName())
+                        .log(Level.SEVERE, "Erro ao receber datagrama UDP", ex);
 
-            pluginManager.handleMessage(msgPacket.getData());
+                break;
+
+            } catch (RuntimeException ex) {
+                Logger.getLogger(SocketUDP.class.getName())
+                        .log(Level.WARNING, "Falha ao processar datagrama UDP", ex);
+            }
         }
+    }
+
+    private void handlePacket(DatagramPacket packet) {
+        byte[] data = Arrays.copyOf(
+                packet.getData(),
+                packet.getLength()
+        );
+
+        Object coreMessage = tryParseCoreUdpMessage(data);
+
+        if (coreMessage instanceof HeartbeatMessage heartbeat) {
+            connectionManager.receiveHeartbeat(
+                    heartbeat,
+                    packet.getAddress()
+            );
+            return;
+        }
+
+        if (coreMessage instanceof GoodbyeMessage goodbye) {
+            connectionManager.receiveGoodbye(goodbye);
+            return;
+        }
+
+        if (coreMessage instanceof SessionInviteMessage invite) {
+            connectionManager.receiveSessionInvite(invite);
+            return;
+        }
+
+        pluginManager.handleMessage(data);
     }
 
     /**
@@ -224,7 +263,7 @@ public class SocketUDP extends Thread {
     public void run() {
         try {
             this.receive();
-        } catch (IOException | ClassNotFoundException ex) {
+        } catch (IOException ex) {
             Logger.getLogger(SocketUDP.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

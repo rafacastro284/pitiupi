@@ -55,27 +55,28 @@ public final class PluginStore {
     }
 
     public Path installFromFile(Path sourceJar) throws PitiupiException, IOException {
-        if (sourceJar == null || !Files.isRegularFile(sourceJar)) {
-            throw new PitiupiException(ErrorCode.INVALID_PATH);
-        }
-        String fileName = sourceJar.getFileName().toString();
-        if (!fileName.endsWith(".jar") || fileName.contains("..")) {
-            throw new PitiupiException(ErrorCode.INVALID_PATH);
-        }
+        return installFromFile(sourceJar, null, true);
+    }
 
-        Files.createDirectories(pluginsDir);
-        Files.createDirectories(cacheDir);
-
-        Path dest = pluginsDir.resolve(fileName).normalize();
-        if (!dest.startsWith(pluginsDir.normalize().toAbsolutePath())) {
-            throw new PitiupiException(ErrorCode.INVALID_PATH);
-        }
-
+    public Path installFromFile(Path sourceJar, String targetName, boolean updateCatalog)
+        throws PitiupiException, IOException {
+           if (sourceJar == null || !Files.isRegularFile(sourceJar)) {
+               throw new PitiupiException(ErrorCode.INVALID_PATH);
+           }
+        String fileName = targetName != null ? targetName : sourceJar.getFileName().toString();
+        if (!fileName.endsWith(".jar") || fileName.contains("..")
+            || fileName.contains("/") || fileName.contains("\\")) {
+        throw new PitiupiException(ErrorCode.INVALID_PATH);
+     }
         Path tmp = cacheDir.resolve(fileName + "." + UUID.randomUUID() + ".part");
+        Path dest = pluginsDir.resolve(fileName);
         try {
             Files.copy(sourceJar, tmp, StandardCopyOption.REPLACE_EXISTING);
             Files.move(tmp, dest, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-            rememberInCatalog(sourceJar, fileName);
+            if (updateCatalog) {
+                rememberInCatalog(sourceJar, fileName);
+            }
+
             return dest;
         } catch (IOException e) {
             try {

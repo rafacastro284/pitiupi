@@ -57,7 +57,7 @@ public final class ApplicationRestarter {
         }
 
         private static String locateRunningJar() {
-            return pitiupi.Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+            return pitiupi.platform.AppVersion.runningJar().map(java.nio.file.Path::toString).orElse(null);
         }
     }
 }
